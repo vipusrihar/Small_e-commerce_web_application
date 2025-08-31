@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  margin: 0;
+  padding: 0;
   text-align: center;
 }
-
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
@@ -15,7 +13,7 @@
 }
 
 .card {
-  padding: 2em;
+  padding: 0;
 }
 
 .read-the-docs {
