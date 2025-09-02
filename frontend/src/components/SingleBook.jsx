@@ -5,7 +5,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getBookById } from '../state/books/bookaction'
+import { getBookById } from '../state/books/bookAction'
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -49,7 +49,7 @@ const SingleBook = ({ book }) => {
     const handleViewBook = (bookId) => {
         dispatch(getBookById(bookId));
         console.info(bookId);
-        // navigate(`/book/${bookId}`);
+        navigate(`/book/${bookId}`);
     };
 
     const handleAddToCart = (book) => {
