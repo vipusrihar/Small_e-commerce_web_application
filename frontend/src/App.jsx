@@ -4,7 +4,8 @@ import HomePage from './pages/HomePage'
 import BookDetail from './components/BookDetail'
 import NavBar from './components/NavBar'
 import OrderForm from './components/OrderForm'
-import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
+import OrdersPage from './pages/OrdersPage'
 
 
 function App() {
@@ -15,8 +16,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path='/book/:bookId' element={<BookDetail />} />
-          <Route path='/login' element={<LoginPage />} />
           <Route path='/order/create' element={<OrderForm />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/orders' element={<OrdersPage/>}/>
         </Routes>
       </BrowserRouter>
     </>
@@ -24,3 +26,7 @@ function App() {
 }
 
 export default App
+
+
+
+

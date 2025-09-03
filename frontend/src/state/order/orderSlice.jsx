@@ -10,7 +10,7 @@ const initialValues = {
 
 
 
-const bookSlice = createSlice({
+const orderSlice = createSlice({
     name: 'orders',
     initialState: initialValues,
     reducers: {
@@ -48,6 +48,6 @@ const bookSlice = createSlice({
 export const {
     getAllOrdersFailure, getAllOrdersStart, getAllOrdersSuccess,
     getOrderByIdFailure, getOrderByIdStart, getOrderByIdSuccess,
-} = bookSlice.actions;
+} = orderSlice.actions;
 
 export default orderSlice.reducer;

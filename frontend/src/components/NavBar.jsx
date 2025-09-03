@@ -57,7 +57,7 @@ const NavBar = () => {
       case "Profile":
         navigate("/profile");
         break;
-      case "Activity":
+      case "Orders":
         navigate("/orders");
         break;
       case "Logout":
