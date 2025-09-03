@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Modal, Typography } from "@mui/material";
 import { loginUser } from "../state/auth/authAction";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
-  const [open, setOpen] = useState(true);
+const LoginPage = ({ open }) => {
   const dispatch = useDispatch();
 
-const handleLogin = () => {
-  console.log("Login button clicked");
-  setOpen(false);
-};
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    console.log("Login button clicked");
+    window.location.href = "http://localhost:8080/oauth2/authorization/asgardeo";
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    dispatch(loginUser(navigate))
+  }, []);
 
 
   return (
@@ -76,6 +83,8 @@ const handleLogin = () => {
           />
         </Box>
       </Box>
+
+
     </Modal>
   );
 };
