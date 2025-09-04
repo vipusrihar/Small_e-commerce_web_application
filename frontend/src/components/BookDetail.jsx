@@ -61,12 +61,6 @@ const BookDetail = () => {
                             {book.description || 'No description available.'}
                         </Typography>
 
-                        <Button variant="contained" color="primary" onClick={() => {
-                            handleAddToCart(book);
-
-                        }}>
-                            {"Add to Cart"}
-                        </Button>
                     </Grid>
                 </Grid>
             </Grid>

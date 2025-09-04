@@ -10,7 +10,6 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
-import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LoginPage from "../pages/LoginPage";
@@ -28,10 +27,6 @@ const NavBar = () => {
 
   const handleLogin = () => {
     setLoginModel(true);
-  };
-
-  const handleAddCartPage = () => {
-    navigate("/cart");
   };
 
   const handleLogout = async () => {
@@ -92,12 +87,6 @@ const NavBar = () => {
             </Typography>
 
             <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto" }}>
-
-              <Box sx={{ paddingRight: 2 }}>
-                <IconButton onClick={handleAddCartPage}>
-                  <ShoppingCartRoundedIcon sx={{ width: 40, height: 40, color: "white" }} />
-                </IconButton>
-              </Box>
 
               {isLoggedIn ? (
                 <>
