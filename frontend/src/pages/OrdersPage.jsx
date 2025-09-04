@@ -1,19 +1,42 @@
-import React from 'react'
-import OrdersTable from '../components/OrdersTable';
-import AddIcon from '@mui/icons-material/Add';
+import React, { useState } from "react";
+import OrdersTable from "../components/OrdersTable";
+import AddIcon from "@mui/icons-material/Add";
+import OrderForm from "../components/OrderForm";
+import { Typography, Fab, Box } from "@mui/material";
 
 const OrdersPage = () => {
-    return (
-        <div className="p-6">
-            <div className="flex justify-end mb-4 mr-5">
-                <button className="bg-blue-500 text-white p-2 rounded-full shadow hover:bg-blue-600">
-                    <AddIcon />
-                </button>
-            </div>
+  const [open, setOpen] = useState(false);
 
-            <OrdersTable />
-        </div>
-    )
-}
+  const handleAdd = () => {
+    setOpen(true);
+  };
 
-export default OrdersPage
+  return (
+    <Box className="p-6">
+      <Box className="flex items-center justify-between mb-6">
+
+        <Box className="w-12" />
+
+        <Typography variant="h5" fontWeight="bold" className="text-center flex-1">
+          My Orders
+        </Typography>
+
+        <Fab
+          color="primary"
+          aria-label="add"
+          onClick={handleAdd}
+          className="shadow"
+          size="medium"
+        >
+          <AddIcon />
+        </Fab>
+      </Box>
+
+      <OrdersTable />
+
+      <OrderForm open={open} onClose={() => setOpen(false)} />
+    </Box>
+  );
+};
+
+export default OrdersPage;

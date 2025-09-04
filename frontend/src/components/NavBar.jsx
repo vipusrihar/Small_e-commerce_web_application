@@ -91,16 +91,14 @@ const NavBar = () => {
               BOOKOCEAN
             </Typography>
 
-            {/* Right side */}
             <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto" }}>
-              {/* Cart button */}
+
               <Box sx={{ paddingRight: 2 }}>
                 <IconButton onClick={handleAddCartPage}>
                   <ShoppingCartRoundedIcon sx={{ width: 40, height: 40, color: "white" }} />
                 </IconButton>
               </Box>
 
-              {/* Show avatar if logged in, else login icon */}
               {isLoggedIn ? (
                 <>
                   <Tooltip title="Open settings">

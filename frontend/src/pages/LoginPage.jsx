@@ -39,12 +39,10 @@ const LoginPage = ({ open }) => {
           borderRadius: 2,
         }}
       >
-        {/* Title */}
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           BOOK OCEAN
         </Typography>
 
-        {/* Login Button Row */}
         <Box
           sx={{
             display: "flex",
