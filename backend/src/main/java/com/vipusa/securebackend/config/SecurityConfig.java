@@ -1,5 +1,6 @@
 package com.vipusa.securebackend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,45 +14,49 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 // Enable CORS
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Disable CSRF for API endpoints (React frontend handles CSRF differently)
+                // CSRF configuration
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
+                        .ignoringRequestMatchers("/api/**") // disable CSRF for API endpoints
                 )
 
-                // Configure endpoint security
+                // Endpoint security
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/book/**").permitAll()  // Public
-                        .requestMatchers("/api/orders/**").authenticated() // Orders require login
+                        .requestMatchers("/api/v1/book/**").permitAll()   // public
+                        .requestMatchers("/api/orders/**").authenticated() // protected
                         .anyRequest().authenticated()
                 )
 
-                // OAuth2 Login configuration
+                // OAuth2 Login
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:5173/profile", true) // redirect frontend after login
+                        .defaultSuccessUrl(frontendUrl + "/profile", true)
                 )
 
-                // Logout configuration
+                // Logout
                 .logout(logout -> logout
-                        .logoutSuccessUrl("http://localhost:5173") // redirect frontend after logout
+                        .logoutSuccessUrl(frontendUrl)
                         .permitAll()
                 );
 
         return http.build();
     }
 
-    // CORS configuration for React frontend
+    // CORS configuration
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // frontend origin
+        configuration.setAllowedOrigins(List.of(frontendUrl)); // frontend origin
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true); // important for cookies
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

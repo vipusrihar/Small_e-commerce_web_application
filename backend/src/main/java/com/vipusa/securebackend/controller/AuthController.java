@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService){
+        this.authService = authService;
+    }
 
     @GetMapping("/api/user")
     public ResponseEntity<ApiResponse<UserDTO>> getUserInfo(Authentication authentication) {
@@ -31,4 +34,5 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 }

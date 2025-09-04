@@ -16,13 +16,15 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/order")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class BookOrderController {
 
-    @Autowired
-    BookOrderService orderService;
+    private final BookOrderService orderService;
+
+    public BookOrderController(BookOrderService orderService){
+        this.orderService = orderService;
+    }
 
     @PostMapping("/")
     public ResponseEntity<ApiResponse<BookOrder>> createOrder(@RequestBody CreateOrderRequest request, Authentication authentication) {
@@ -54,18 +56,18 @@ public class BookOrderController {
 
     }
 
-    @GetMapping("/user/{email}")
-    public ResponseEntity<ApiResponse<List<BookOrder>>> findAllOrdersByEmail(@PathVariable String email) {
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<List<BookOrder>>>getOrders(Authentication authentication) {
 
-        List<BookOrder> orders = orderService.findOrdersByEmail(email);
+        List<BookOrder> orders = orderService.findOrdersByEmail(authentication);
+
         ApiResponse<List<BookOrder>> response = ApiResponse.<List<BookOrder>>builder()
-                .isSuccess(true)
-                .message("Books For User Fetched Successfully")
                 .response(orders)
+                .message("Orders Fetched Successfully")
+                .isSuccess(true)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
-
     }
 
 }

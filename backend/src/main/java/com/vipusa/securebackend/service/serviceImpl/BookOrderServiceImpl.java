@@ -19,21 +19,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
 public class BookOrderServiceImpl implements BookOrderService {
 
-    @Autowired
-    private BookOrderRepository bookOrderRepository;
+    private final BookOrderRepository bookOrderRepository;
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
+    public BookOrderServiceImpl(BookOrderRepository bookOrderRepository,
+                                BookRepository bookRepository,
+                                AuthService authService) {
+        this.bookOrderRepository = bookOrderRepository;
+        this.bookRepository = bookRepository;
+        this.authService = authService;
+    }
 
 
     @Override
@@ -73,16 +79,18 @@ public class BookOrderServiceImpl implements BookOrderService {
 
             // Reduce Stock
             book.setStock(book.getStock() - item.getQuantity());
-            bookRepository.saveAndFlush(book); // flush immediately
+//            bookRepository.saveAndFlush(book); // flush immediately
+            bookRepository.save(book);
 
             totalAmount += orderItem.getAmount();
             orderItems.add(orderItem);
         }
+        bookOrder.setOrderItems(Collections.unmodifiableList(orderItems));
 
         bookOrder.setOrderItems(orderItems);
         bookOrder.setTotalAmount(totalAmount);
 
-        bookOrder.setOrderDate(LocalDateTime.now());
+        bookOrder.setOrderDate(LocalDateTime.now(ZoneId.of("Asia/Colombo"))); //Sri Lanka timezone
         bookOrder.setPreferredDate(request.getPreferredDate());
         bookOrder.setPreferredTime(request.getPreferredTime());
         bookOrder.setPreferredLocation(changeToLocation(request.getPreferredLocation().toUpperCase()));
@@ -95,7 +103,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
     private LOCATION changeToLocation(String location){
         try {
-            return LOCATION.valueOf(location);
+            return LOCATION.valueOf(location.trim().toUpperCase());
         } catch(Exception e) {
             throw new IllegalArgumentException("Invalid location: " + location);
         }
@@ -108,7 +116,9 @@ public class BookOrderServiceImpl implements BookOrderService {
     }
 
     @Override
-    public List<BookOrder> findOrdersByEmail(String email) {
+    public List<BookOrder> findOrdersByEmail(Authentication authentication) {
+        UserDTO user = authService.getUserInformation(authentication);
+        String email = user.getEmail();
         return bookOrderRepository.findByEmail(email);
     }
 }

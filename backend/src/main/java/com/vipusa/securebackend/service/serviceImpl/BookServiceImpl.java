@@ -12,9 +12,12 @@ import java.util.List;
 @Component
 public class BookServiceImpl implements BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
 
+    private final BookRepository bookRepository;
+
+    public BookServiceImpl(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     @Override
     public Book findBookById(Integer bookId) throws ResourceNotFoundException {
@@ -28,5 +31,14 @@ public class BookServiceImpl implements BookService {
     public List<Book> findAllBooks() {
         return bookRepository.findAll();
     }
+
+    @Override
+    public List<Book> searchBooks(String searchText) {
+        if (searchText == null || searchText.isBlank()) {
+            return bookRepository.findAll(); // Return all if search is empty
+        }
+        return bookRepository.searchBooks(searchText.trim());
+    }
+
 
 }

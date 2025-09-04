@@ -4,7 +4,6 @@ import com.vipusa.securebackend.model.entity.Book;
 import com.vipusa.securebackend.response.ApiResponse;
 import com.vipusa.securebackend.service.service.BookService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -18,8 +17,11 @@ import java.util.List;
 @Slf4j
 public class BookController {
 
-    @Autowired
-    private BookService bookService;
+    private final BookService bookService;
+
+    public BookController(BookService bookService){
+        this.bookService = bookService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<Book>>> findAllBook() {
@@ -49,5 +51,21 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Book>>> searchBooks(
+            @RequestParam(value = "query", required = false) String query) {
+
+        List<Book> books = bookService.searchBooks(query);
+
+        ApiResponse<List<Book>> response = ApiResponse.<List<Book>>builder()
+                .response(books)
+                .isSuccess(true)
+                .message(query == null || query.isEmpty() ?
+                        "All Books Fetched Successfully" :
+                        "Search Results Fetched Successfully")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 }
