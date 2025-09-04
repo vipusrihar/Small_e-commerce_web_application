@@ -14,6 +14,20 @@ const orderSlice = createSlice({
     name: 'orders',
     initialState: initialValues,
     reducers: {
+        createOrderStart: (state) => {
+            state.isLoading = true;
+            state.error = null;
+        },
+        createOrderSuccess: (state, action) => {
+            state.isLoading = false;
+            state.orders = state.orders.push( action.payload);
+            state.success = true;
+        },
+        createOrderFailure: (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+            state.success = false;
+        },
         getAllOrdersStart: (state) => {
             state.isLoading = true;
             state.error = null;
@@ -46,6 +60,7 @@ const orderSlice = createSlice({
 })
 
 export const {
+    createOrderStart, createOrderSuccess, createOrderFailure,
     getAllOrdersFailure, getAllOrdersStart, getAllOrdersSuccess,
     getOrderByIdFailure, getOrderByIdStart, getOrderByIdSuccess,
 } = orderSlice.actions;
