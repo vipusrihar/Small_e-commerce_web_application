@@ -1,6 +1,7 @@
 package com.vipusa.securebackend.service.serviceImpl;
 
 import com.vipusa.securebackend.Exception.ResourceNotFoundException;
+import com.vipusa.securebackend.model.UserDTO;
 import com.vipusa.securebackend.model.entity.Book;
 import com.vipusa.securebackend.model.entity.BookOrder;
 import com.vipusa.securebackend.model.entity.OrderItem;
@@ -10,10 +11,12 @@ import com.vipusa.securebackend.model.request.CreateOrderRequest;
 import com.vipusa.securebackend.model.request.OrderItemRequest;
 import com.vipusa.securebackend.repository.BookOrderRepository;
 import com.vipusa.securebackend.repository.BookRepository;
+import com.vipusa.securebackend.service.service.AuthService;
 import com.vipusa.securebackend.service.service.BookOrderService;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,13 +31,27 @@ public class BookOrderServiceImpl implements BookOrderService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private AuthService authService;
+
+
 
     @Override
-    public BookOrder createOrder(CreateOrderRequest request) {
-        BookOrder bookOrder = new BookOrder();
+    @Transactional
+    public BookOrder createOrder(CreateOrderRequest request, Authentication authentication) {
 
-//        OAuth2AuthorizedClientService authorizedClientService
-//        bookOrder.setFirstName(user);
+        UserDTO userDTO = authService.getUserInformation(authentication);
+
+        if( !userDTO.getEmail().equals(request.getEmail())){
+            throw new RuntimeException("There is an error");
+        }
+
+        BookOrder bookOrder = new BookOrder();
+        bookOrder.setEmail(userDTO.getEmail());
+
+        if(request.getOrderItems() == null || request.getOrderItems().isEmpty()){
+            throw new IllegalArgumentException("Order must contain at least one product");
+        }
 
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0.0;
@@ -56,7 +73,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
             // Reduce Stock
             book.setStock(book.getStock() - item.getQuantity());
-            bookRepository.save(book);
+            bookRepository.saveAndFlush(book); // flush immediately
 
             totalAmount += orderItem.getAmount();
             orderItems.add(orderItem);
@@ -77,8 +94,13 @@ public class BookOrderServiceImpl implements BookOrderService {
     }
 
     private LOCATION changeToLocation(String location){
-        return LOCATION.valueOf(location);
+        try {
+            return LOCATION.valueOf(location);
+        } catch(Exception e) {
+            throw new IllegalArgumentException("Invalid location: " + location);
+        }
     }
+
     @Override
     public BookOrder findOrderById(Integer orderId) {
         return bookOrderRepository.findById(orderId)

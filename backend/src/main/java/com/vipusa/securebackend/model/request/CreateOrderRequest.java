@@ -10,6 +10,8 @@ import java.util.List;
 @Setter
 public class CreateOrderRequest {
 
+    private String email;
+
     private List<OrderItemRequest> orderItems;
 
     private LocalDate preferredDate;

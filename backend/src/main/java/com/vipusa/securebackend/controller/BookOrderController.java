@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,15 +18,16 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/order")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class BookOrderController {
 
     @Autowired
     BookOrderService orderService;
 
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<BookOrder>> createOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<ApiResponse<BookOrder>> createOrder(@RequestBody CreateOrderRequest request, Authentication authentication) {
 
-        BookOrder createdOrder = orderService.createOrder(request);
+        BookOrder createdOrder = orderService.createOrder(request,authentication);
 
         ApiResponse<BookOrder> response = ApiResponse.<BookOrder>builder()
                 .response(createdOrder)
