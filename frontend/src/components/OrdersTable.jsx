@@ -2,29 +2,21 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getOrdersByEmail } from "../state/order/orderAction";
 import {
-  Card,
-  CardContent,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  Chip,
+  Card, CardContent, Table, TableHead, TableRow, TableCell,
+  TableBody, Typography, Chip,
 } from "@mui/material";
 
 const OrdersTable = () => {
-  const userEmail = useSelector((state) => state.auth.auth.email);
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
 
   useEffect(() => {
-    if (userEmail) {
-      dispatch(getOrdersByEmail(userEmail));
-    }
-  }, [userEmail, dispatch]);
+    dispatch(getOrdersByEmail());
+  }, [dispatch]);
 
-  const headings = ["ID", "Preferred Location", "Preffered Date","Preffered Time", "Status", "Amount", "Message"];
+  const headings = [
+    "ID", "Preferred Location", "Preferred Date", "Preferred Time", "Status", "Amount", "Message"
+  ];
 
   const statusColors = {
     STATUS_ORDERED: "warning",
@@ -37,7 +29,7 @@ const OrdersTable = () => {
   };
 
   return (
-    <div className="p-6 pt-0 ">
+    <div className="p-6 pt-0">
       <Card className="shadow-lg border-2 rounded-2xl">
         <CardContent>
           <Table>
@@ -77,7 +69,7 @@ const OrdersTable = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={7} align="center">
                     No orders found.
                   </TableCell>
                 </TableRow>

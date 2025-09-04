@@ -17,6 +17,7 @@ import { getAllBooks } from "../state/books/bookAction";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { createOrder } from "../state/order/orderAction";
+import DOMPurify from "dompurify";
 
 const OrderForm = ({ open, onClose }) => {
   const user = useSelector((state) => state.auth.auth);
@@ -32,28 +33,45 @@ const OrderForm = ({ open, onClose }) => {
   const [quantity, setQuantity] = useState(1);
 
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(getAllBooks());
   }, [dispatch]);
 
-  const products = useSelector((state) => state.books.books);
+  const products = useSelector((state) => state.books.books) || [];
 
+  // Disable past dates and Sundays
   const disableDates = (date) => {
     const today = new Date();
-    if (date < today.setHours(0, 0, 0, 0)) return true;
-    if (date.getDay() === 0) return true;
+    today.setHours(0, 0, 0, 0);
+    return date < today || date.getDay() === 0;
   };
 
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: DOMPurify.sanitize(value),
     }));
   };
 
+  // Add product to order
   const addProduct = () => {
     if (!selectedProduct) return;
+
+    const existingIndex = formData.orderItems.findIndex(
+      (item) => item.bookId === selectedProduct.id
+    );
+    if (existingIndex !== -1) {
+      alert("Product already added. Adjust quantity instead.");
+      return;
+    }
+
+    if (quantity < 1) {
+      alert("Quantity must be at least 1");
+      return;
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -61,7 +79,7 @@ const OrderForm = ({ open, onClose }) => {
         ...prev.orderItems,
         {
           bookId: selectedProduct.id,
-          product: selectedProduct.title,
+          product: DOMPurify.sanitize(selectedProduct.title),
           quantity,
         },
       ],
@@ -77,34 +95,57 @@ const OrderForm = ({ open, onClose }) => {
       orderItems: prev.orderItems.filter((_, i) => i !== index),
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user?.email) {
+      alert("You must be logged in to place an order.");
+      return;
+    }
+
+    if (!formData.date || !formData.time || !formData.district) {
+      alert("Please fill in all required fields.");
+      return;
+    }
 
     if (formData.orderItems.length === 0) {
       alert("Please add at least one product.");
       return;
     }
 
+    const formattedDate = formData.date.toISOString().split("T")[0];
+
     const orderData = {
-      email: user?.email || "",
-      preferredDate: formData.date,
-      preferredTime: formData.time,
-      preferredLocation: formData.district,
-      orderItems: formData.orderItems.map(({ bookId, quantity }) => ({ bookId, quantity })),
-      message: formData.message,
+      email: DOMPurify.sanitize(user.email),
+      preferredDate: formattedDate,
+      preferredTime: DOMPurify.sanitize(formData.time),
+      preferredLocation: DOMPurify.sanitize(formData.district),
+      orderItems: formData.orderItems.map(({ bookId, quantity }) => ({
+        bookId,
+        quantity,
+      })),
+      message: DOMPurify.sanitize(formData.message),
     };
 
     try {
-      await dispatch(createOrder(orderData)); // wait for API call
-      setFormData({ date: null, time: "", district: "", orderItems: [], message: "" });
+      await dispatch(createOrder(orderData)); 
+
+      setFormData({
+        date: null,
+        time: "",
+        district: "",
+        orderItems: [],
+        message: "",
+      });
       setSelectedProduct(null);
       setQuantity(1);
-      onClose(); // ✅ close modal only on success
+      onClose();
     } catch (err) {
-      alert("Failed to submit order. See console for details.");
+      console.error(err);
+      alert("Failed to submit order.");
     }
   };
-
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -136,7 +177,7 @@ const OrderForm = ({ open, onClose }) => {
 
           <TextField
             label="Username"
-            value={user?.name || ""}
+            value={DOMPurify.sanitize(user?.name || "")}
             InputProps={{ readOnly: true }}
             required
           />
@@ -163,7 +204,7 @@ const OrderForm = ({ open, onClose }) => {
           >
             {TIME.map((t) => (
               <MenuItem key={t} value={t}>
-                {t}
+                {DOMPurify.sanitize(t)}
               </MenuItem>
             ))}
           </TextField>
@@ -172,7 +213,10 @@ const OrderForm = ({ open, onClose }) => {
             options={LOCATION}
             value={formData.district || null}
             onChange={(e, newValue) =>
-              setFormData((prev) => ({ ...prev, district: newValue }))
+              setFormData((prev) => ({
+                ...prev,
+                district: DOMPurify.sanitize(newValue),
+              }))
             }
             renderInput={(params) => (
               <TextField {...params} label="Delivery Location" required />
@@ -192,7 +236,9 @@ const OrderForm = ({ open, onClose }) => {
               type="number"
               label="Quantity"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              onChange={(e) =>
+                setQuantity(Math.max(1, Number(e.target.value)))
+              }
               inputProps={{ min: 1 }}
               sx={{ width: 100 }}
             />
@@ -211,7 +257,7 @@ const OrderForm = ({ open, onClose }) => {
                 my={1}
               >
                 <span>
-                  {item.product} x {item.quantity}
+                  {DOMPurify.sanitize(item.product)} x {item.quantity}
                 </span>
                 <Button
                   color="error"
@@ -229,7 +275,7 @@ const OrderForm = ({ open, onClose }) => {
             label="Message"
             multiline
             rows={3}
-            value={formData.message}
+            value={DOMPurify.sanitize(formData.message)}
             onChange={handleChange}
           />
 

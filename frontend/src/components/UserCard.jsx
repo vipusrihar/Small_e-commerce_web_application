@@ -1,39 +1,69 @@
-import { Modal } from '@mui/material'
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Modal, Box, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const UserCard = ({ user, open, onClose }) => {
   const navigate = useNavigate();
-  const handleCLose = () => {
-    
-    navigate("/");
-    onClose
-  }
+
+  const handleClose = () => {
+    navigate('/');
+    onClose();
+  };
+
+  if (!user) return null; // Defensive check
+
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="max-w-md bg-white shadow-lg rounded-2xl p-6">
-          <h2 className="text-xl font-bold mb-4">{user.name}</h2>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Phone:</strong> {user.phone_number}</p>
-          <p><strong>Username:</strong> {user.preferred_username}</p>
-          <p><strong>Role:</strong> {user.roles}</p>
-          <p>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <Box
+          sx={{
+            maxWidth: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            borderRadius: 3,
+            p: 4,
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            {user.name}
+          </Typography>
+          <Typography><strong>Email:</strong> {user.email}</Typography>
+          <Typography><strong>Phone:</strong> {user.phone_number}</Typography>
+          <Typography><strong>Username:</strong> {user.preferred_username}</Typography>
+          <Typography><strong>Role:</strong> {user.roles}</Typography>
+          <Typography>
             <strong>Address:</strong> {user.street_address}, {user.postal_code}, {user.country}
-          </p>
+          </Typography>
 
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={() => handleCLose()}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button
+              onClick={handleClose}
+              sx={{
+                backgroundColor: '#ef4444',
+                color: '#fff',
+                px: 2,
+                py: 1,
+                borderRadius: 2,
+                boxShadow: 2,
+                '&:hover': {
+                  backgroundColor: '#dc2626',
+                },
+              }}
             >
               Close
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </Box>
+        </Box>
+      </Box>
     </Modal>
-  )
-}
+  );
+};
 
-export default UserCard
+export default UserCard;

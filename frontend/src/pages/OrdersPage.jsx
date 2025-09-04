@@ -5,11 +5,13 @@ import OrderForm from "../components/OrderForm";
 import { Typography, Fab, Box } from "@mui/material";
 
 const OrdersPage = () => {
+
   const [open, setOpen] = useState(false);
 
   const handleAdd = () => {
-    setOpen(true);
+    if (!open) setOpen(true);
   };
+
 
   return (
     <Box className="p-6">

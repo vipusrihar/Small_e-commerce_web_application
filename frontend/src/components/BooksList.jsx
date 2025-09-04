@@ -1,7 +1,7 @@
-import React, { useEffect, useState, } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllBooks } from '../state/books/bookAction'
+import { searchBooks } from '../state/books/bookAction';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled, alpha } from '@mui/material/styles';
@@ -60,34 +60,17 @@ const BooksList = () => {
   const books = useSelector((state) => state.books.books) || [];
   const [searchText, setSearchText] = useState('');
 
+
   useEffect(() => {
-    if (books.length === 0) {
-      dispatch(getAllBooks());
-    }
-  }, [dispatch, books]);
-
-
-
-  const filteredBooks = books.filter((book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchText.toLowerCase()) ||
-      book.isbn.includes(searchText)
-    return matchesSearch;
-  });
-
+    dispatch(searchBooks(searchText));
+  }, [dispatch, searchText]);
 
   return (
     <>
       <Box sx={{ pt: 0, mt: 0 }}>
-        <Box
-          sx={{
-            flexGrow: 1,
-            display: { xs: 'none', md: 'flex' },
-            justifyContent: 'center', marginTop: 0
-          }}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', mt: 0 }}>
           <Search>
-            <SearchIconWrapper >
+            <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
@@ -96,20 +79,17 @@ const BooksList = () => {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-
           </Search>
         </Box>
       </Box>
-      <Box sx={{ flexGrow: 1, padding: 4, }}>
-        <Grid container spacing={4}>
-          {filteredBooks.map((book) => (
 
+      <Box sx={{ flexGrow: 1, padding: 4 }}>
+        <Grid container spacing={4}>
+          {books.map((book) => (
             <SingleBook key={book.id} book={book} />
-            
           ))}
         </Grid>
       </Box>
-
     </>
   );
 };

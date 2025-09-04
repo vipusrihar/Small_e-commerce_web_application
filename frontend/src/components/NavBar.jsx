@@ -1,53 +1,32 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-
+import React, { useState } from "react";
+import {  AppBar,  Box,  Toolbar,  IconButton,  Typography,
+  Menu,  Container,  Avatar,  Tooltip,  MenuItem,} from "@mui/material";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import LoginPage from "../pages/LoginPage";
 import { useSelector } from "react-redux";
+import LoginPage from "../pages/LoginPage";
 
 const settings = ["Profile", "Orders", "Logout"];
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const [loginModel, setLoginModel] = useState(false);
-
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const user = useSelector((state) => state.auth.auth);
 
+  const [loginModal, setLoginModal] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const handleLogin = () => {
-    setLoginModel(true);
-  };
+  const handleLogin = () => setLoginModal(true);
 
-  const handleLogout = async () => {
-    await fetch("http://localhost:8080/logout", {
-      method: "POST",
-      credentials: "include"
-    });
-    window.location.href = "http://localhost:5173";
-  };
+const handleLogout = () => {
+  window.location.href = "http://localhost:8080/logout";
+};
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleMenuClick = (setting) => {
     handleCloseUserMenu();
-
     switch (setting) {
       case "Profile":
         navigate("/profile");
@@ -56,7 +35,7 @@ const NavBar = () => {
         navigate("/orders");
         break;
       case "Logout":
-        window.location.href = "http://localhost:8080/logout";
+        handleLogout();
         break;
       default:
         break;
@@ -71,8 +50,8 @@ const NavBar = () => {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
+              component="span"
+              onClick={() => navigate("/")}
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
@@ -81,23 +60,25 @@ const NavBar = () => {
                 letterSpacing: ".3rem",
                 color: "inherit",
                 textDecoration: "none",
+                cursor: "pointer",
               }}
             >
               BOOKOCEAN
             </Typography>
 
             <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto" }}>
-
               {isLoggedIn ? (
                 <>
                   <Tooltip title="Open settings">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                      <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                      <Avatar
+                        alt={user?.name || "User Avatar"}
+                        src={user?.avatar || ""}
+                      />
                     </IconButton>
                   </Tooltip>
                   <Menu
                     sx={{ mt: "45px" }}
-                    id="menu-appbar"
                     anchorEl={anchorElUser}
                     anchorOrigin={{ vertical: "top", horizontal: "right" }}
                     keepMounted
@@ -121,7 +102,8 @@ const NavBar = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      <LoginPage open={loginModel} />
+
+      {loginModal && <LoginPage open={loginModal} onClose={() => setLoginModal(false)} />}
     </>
   );
 };

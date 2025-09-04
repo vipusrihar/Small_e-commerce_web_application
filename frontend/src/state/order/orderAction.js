@@ -1,3 +1,4 @@
+import { securedApi } from "../../config/API";
 import { 
   createOrderStart, createOrderSuccess, createOrderFailure, 
   getAllOrdersStart, getAllOrdersSuccess, getAllOrdersFailure 
@@ -9,58 +10,31 @@ export const createOrder = (orderData) => async (dispatch) => {
   try {
     console.log("Order data:", JSON.stringify(orderData));
 
-    const response = await fetch("http://localhost:8080/api/v1/order/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(orderData),
-    });
+    const { data } = await securedApi.post("/order/", orderData, { withCredentials: true });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      let errMsg = "Failed to create order";
-      if (errText) {
-        const errJson = JSON.parse(errText);
-        errMsg = errJson.message || errMsg;
-      }
-      throw new Error(errMsg);
-    }
-
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
-
-    dispatch(createOrderSuccess(data?.response || {}));
+    dispatch(createOrderSuccess(data?.response || data));
     window.alert("Order successfully placed!");
-    return data?.response || {};
+    return data?.response || data;
   } catch (error) {
-    console.error("Create order error:", error);
-    dispatch(createOrderFailure(error.message));
+    const message =
+      error.response?.data?.message || error.message || "Failed to create order";
+    console.error("Create order error:", message);
+    dispatch(createOrderFailure(message));
   }
 };
 
 // GET ORDERS BY EMAIL
-export const getOrdersByEmail = (email) => async (dispatch) => {
+export const getOrdersByEmail = () => async (dispatch) => {
   dispatch(getAllOrdersStart());
   try {
-    const response = await fetch(`http://localhost:8080/api/v1/order/user/${email}`, {
-      method: "GET",
-      credentials: "include",
-    });
+    const { data } = await securedApi.get("/order/user", { withCredentials: true });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      let errMsg = "Failed to fetch orders";
-      if (errText) {
-        const errJson = JSON.parse(errText);
-        errMsg = errJson.message || errMsg;
-      }
-      throw new Error(errMsg);
-    }
-
-    const data = await response.json();
-    dispatch(getAllOrdersSuccess(data.response));
+    console.log("Orders:", data?.response || data);
+    dispatch(getAllOrdersSuccess(data?.response || data));
   } catch (error) {
-    console.error("Get orders error:", error);
-    dispatch(getAllOrdersFailure(error.message));
+    const message =
+      error.response?.data?.message || error.message || "Failed to fetch orders";
+    console.error("Get orders error:", message);
+    dispatch(getAllOrdersFailure(message));
   }
 };

@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import UserCard from '../components/UserCard'
-import { useLocation } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import UserCard from '../components/UserCard';
+import { loginUser } from '../state/auth/authAction';
+
 
 const ProfilePage = () => {
-  const location = useLocation()
+  const location = useLocation();
+  const dispatch = useDispatch();
 
-  // ✅ declare state first
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-  // ✅ then use it inside useEffect
   useEffect(() => {
     if (location.pathname === '/profile') {
-      setOpen(true)
+      setOpen(true);
     } else {
-      setOpen(false)
+      setOpen(false);
     }
-  }, [location])
+  }, [location]);
 
-  const user = useSelector((state) => state.auth.auth)
-  const isLoading = useSelector((state) => state.auth.isLoading)
+  useEffect(() => {
+    dispatch(loginUser());
+  }, [dispatch]);
 
-  console.log('User:', user)
+  const user = useSelector((state) => state.auth.auth);
+  const isLoading = useSelector((state) => state.auth.isLoading);
+
+  console.log('User:', user);
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen">
@@ -30,10 +35,10 @@ const ProfilePage = () => {
       ) : user ? (
         <UserCard user={user} open={open} onClose={() => setOpen(false)} />
       ) : (
-        <p className="text-red-500">No user data available</p>
+       <div> loading</div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;

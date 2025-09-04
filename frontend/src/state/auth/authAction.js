@@ -1,26 +1,29 @@
-import { loginFailure, loginStart, loginSuccess } from './authSlice';
+import { loginFailure, loginStart, loginSuccess } from "./authSlice";
 
 export const loginUser = (navigate) => async (dispatch) => {
-    dispatch(loginStart());
-    try {
-        const res = await fetch("http://localhost:8080/api/user", {
-            credentials: "include",
-        });
-        if (!res.ok) throw new Error("Not authenticated");
-        const data = await res.json();
+  dispatch(loginStart());
 
-        localStorage.setItem("user", data.response.username);
-        console.info(data);
+  try {
+    const res = await fetch("http://localhost:8080/api/user", {
+      method: "GET",
+      credentials: "include",
+    });
 
-        dispatch(loginSuccess(data.response));
-
-        // Delay navigation (e.g., 2 seconds)
-        setTimeout(() => {
-            navigate("/profile");
-        }, 2000);
-
-    } catch (error) {
-        console.error("Login error:", error.message);
-        dispatch(loginFailure());
+    if (!res.ok) {
+      throw new Error("Not authenticated");
     }
+
+    const data = await res.json();
+
+    if (!data?.response) {
+      throw new Error("Invalid user data");
+    }
+
+    dispatch(loginSuccess(data.response));
+
+    if (navigate) navigate("/");
+  } catch (error) {
+    console.error("Login error:", error.message);
+    dispatch(loginFailure());
+  }
 };

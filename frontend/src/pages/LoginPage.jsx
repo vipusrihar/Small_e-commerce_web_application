@@ -1,27 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Modal, Typography } from "@mui/material";
-import { loginUser } from "../state/auth/authAction";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
-const LoginPage = ({ open }) => {
-  const dispatch = useDispatch();
-
-  const navigate = useNavigate();
+const LoginPage = ({ open, onClose }) => {
 
   const handleLogin = () => {
-    console.log("Login button clicked");
+    // Redirect to Asgardeo OAuth2 authorization
     window.location.href = "http://localhost:8080/oauth2/authorization/asgardeo";
-    setOpen(false);
   };
 
-  useEffect(() => {
-    dispatch(loginUser(navigate))
-  }, []);
-
-
   return (
-    <Modal open={open} onClose={() => setOpen(false)}>
+    <Modal open={open} onClose={onClose}>
       <Box
         display="flex"
         flexDirection="column"
@@ -81,8 +69,6 @@ const LoginPage = ({ open }) => {
           />
         </Box>
       </Box>
-
-
     </Modal>
   );
 };
