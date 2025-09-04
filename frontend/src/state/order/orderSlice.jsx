@@ -20,7 +20,7 @@ const orderSlice = createSlice({
         },
         createOrderSuccess: (state, action) => {
             state.isLoading = false;
-            state.orders = state.orders.push( action.payload);
+            state.orders =  [...state.orders, action.payload];
             state.success = true;
         },
         createOrderFailure: (state, action) => {
