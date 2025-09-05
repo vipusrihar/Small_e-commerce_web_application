@@ -17,7 +17,7 @@ const handleBookError = (error, dispatch, failureAction) => {
 export const getAllBooks = () => async (dispatch) => {
   dispatch(getAllBooksStart());
   try {
-    const response = await publicApi.get('/book/all');
+    const response = await publicApi.get('/v1/book/all');
     dispatch(getAllBooksSuccess(extractResponse(response)));
   } catch (error) {
     throw new Error(handleBookError(error, dispatch, getAllBooksFailure));
@@ -28,7 +28,7 @@ export const getBookById = (bookId) => async (dispatch) => {
   dispatch(getBookByIdStart());
   try {
     if (!bookId) throw new Error('Book ID is required');
-    const response = await publicApi.get(`/book/${bookId}`);
+    const response = await publicApi.get(`/v1/book/${bookId}`);
     dispatch(getBookByIdSuccess(extractResponse(response)));
   } catch (error) {
     throw new Error(handleBookError(error, dispatch, getBookByIdFailure));
@@ -38,7 +38,7 @@ export const getBookById = (bookId) => async (dispatch) => {
 export const searchBooks = (searchText) => async (dispatch) => {
   dispatch(getAllBooksStart());
   try {
-    const response = await publicApi.get(`/book/search?query=${encodeURIComponent(searchText)}`);
+    const response = await publicApi.get(`/v1/book/search?query=${encodeURIComponent(searchText)}`);
     dispatch(getAllBooksSuccess(extractResponse(response)));
   } catch (error) {
     throw new Error(handleBookError(error, dispatch, getAllBooksFailure));

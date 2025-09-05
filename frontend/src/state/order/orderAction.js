@@ -10,7 +10,7 @@ export const createOrder = (orderData) => async (dispatch) => {
   try {
     console.log("Order data:", JSON.stringify(orderData));
 
-    const { data } = await securedApi.post("/order/", orderData, { withCredentials: true });
+    const { data } = await securedApi.post("/v1/order/", orderData, { withCredentials: true });
 
     dispatch(createOrderSuccess(data?.response || data));
     window.alert("Order successfully placed!");
@@ -27,7 +27,7 @@ export const createOrder = (orderData) => async (dispatch) => {
 export const getOrdersByEmail = () => async (dispatch) => {
   dispatch(getAllOrdersStart());
   try {
-    const { data } = await securedApi.get("/order/user", { withCredentials: true });
+    const { data } = await securedApi.get("/v1/order/user", { withCredentials: true });
 
     console.log("Orders:", data?.response || data);
     dispatch(getAllOrdersSuccess(data?.response || data));

@@ -4,7 +4,7 @@ export const loginUser = (navigate) => async (dispatch) => {
   dispatch(loginStart());
 
   try {
-    const res = await fetch("http://localhost:8080/api/user", {
+    const res = await fetch("/api/user", {
       method: "GET",
       credentials: "include",
     });
