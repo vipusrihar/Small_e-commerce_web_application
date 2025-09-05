@@ -4,7 +4,11 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# application.properties
 **/src/main/resources/application.properties
+# SSL certs
+keystore.p12
+**/src/main/resources/keystore.p12
 
 ### STS ###
 .apt_generated
