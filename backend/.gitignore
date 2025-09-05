@@ -10,6 +10,9 @@ target/
 keystore.p12
 **/src/main/resources/keystore.p12
 
+#log files
+logs
+
 ### STS ###
 .apt_generated
 .classpath

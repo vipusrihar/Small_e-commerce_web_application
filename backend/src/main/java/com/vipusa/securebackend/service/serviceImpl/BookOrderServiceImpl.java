@@ -13,10 +13,10 @@ import com.vipusa.securebackend.repository.BookOrderRepository;
 import com.vipusa.securebackend.repository.BookRepository;
 import com.vipusa.securebackend.service.service.AuthService;
 import com.vipusa.securebackend.service.service.BookOrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,13 +28,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Component
+@Slf4j
+@Service
 public class BookOrderServiceImpl implements BookOrderService {
 
     private final BookOrderRepository bookOrderRepository;
-
     private final BookRepository bookRepository;
-
     private final AuthService authService;
 
     public BookOrderServiceImpl(BookOrderRepository bookOrderRepository,
@@ -48,14 +47,18 @@ public class BookOrderServiceImpl implements BookOrderService {
     @Override
     @Transactional
     public BookOrder createOrder(CreateOrderRequest request, Authentication authentication) {
-
         UserDTO userDTO = authService.getUserInformation(authentication);
 
+        log.info("User [{}] is attempting to create an order", userDTO.getEmail());
+
         if (!userDTO.getEmail().equals(request.getEmail())) {
+            log.warn("Unauthorized order attempt: {} tried to place order for {}",
+                    userDTO.getEmail(), request.getEmail());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot place orders on behalf of another user");
         }
 
         if (request.getOrderItems() == null || request.getOrderItems().isEmpty()) {
+            log.error("Order creation failed for user [{}]: No items provided", userDTO.getEmail());
             throw new IllegalArgumentException("Order must contain at least one product");
         }
 
@@ -67,9 +70,14 @@ public class BookOrderServiceImpl implements BookOrderService {
 
         for (OrderItemRequest item : request.getOrderItems()) {
             Book book = bookRepository.findById(item.getBookId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Book Not Found With ID " + item.getBookId()));
+                    .orElseThrow(() -> {
+                        log.error("Book not found with ID: {}", item.getBookId());
+                        return new ResourceNotFoundException("Book Not Found With ID " + item.getBookId());
+                    });
 
             if (book.getStock() < item.getQuantity()) {
+                log.warn("Not enough stock for book [{}]. Requested: {}, Available: {}",
+                        book.getTitle(), item.getQuantity(), book.getStock());
                 throw new IllegalArgumentException("Not enough stock for book: " + book.getTitle());
             }
 
@@ -79,16 +87,18 @@ public class BookOrderServiceImpl implements BookOrderService {
             orderItem.setQuantity(item.getQuantity());
             orderItem.setAmount(book.getPrice() * item.getQuantity());
 
-            // Reduce Stock safely
+            // Reduce stock safely
             book.setStock(book.getStock() - item.getQuantity());
             bookRepository.save(book);
 
             totalAmount += orderItem.getAmount();
             orderItems.add(orderItem);
+
+            log.info("Added book [{}] x{} to order. Remaining stock: {}",
+                    book.getTitle(), item.getQuantity(), book.getStock());
         }
 
         bookOrder.setOrderItems(Collections.unmodifiableList(orderItems));
-
         bookOrder.setTotalAmount(totalAmount);
 
         checkDate(request.getPreferredDate());
@@ -100,38 +110,50 @@ public class BookOrderServiceImpl implements BookOrderService {
         bookOrder.setMessage(request.getMessage());
         bookOrder.setStatus(STATUS.STATUS_ORDERED);
 
-        return bookOrderRepository.save(bookOrder);
+        BookOrder savedOrder = bookOrderRepository.save(bookOrder);
+
+        log.info("Order [{}] created successfully for user [{}] with total amount {}",
+                savedOrder.getId(), savedOrder.getEmail(), savedOrder.getTotalAmount());
+
+        return savedOrder;
     }
 
     private void checkDate(LocalDate preferred) {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Colombo"));
         if (preferred.isBefore(today)) {
+            log.warn("Invalid preferred date [{}]: before today [{}]", preferred, today);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Preferred date cannot be in the past");
         }
         if (preferred.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            log.warn("Invalid preferred date [{}]: Sunday delivery not allowed", preferred);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Delivery cannot be scheduled on Sunday");
         }
     }
-
 
     private LOCATION changeToLocation(String location){
         try {
             return LOCATION.valueOf(location.trim().toUpperCase());
         } catch(Exception e) {
+            log.error("Invalid location: {}", location, e);
             throw new IllegalArgumentException("Invalid location: " + location);
         }
     }
 
     @Override
     public BookOrder findOrderById(Integer orderId) {
+        log.info("Fetching order with ID: {}", orderId);
         return bookOrderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order Not Found with ID " + orderId));
+                .orElseThrow(() -> {
+                    log.error("Order not found with ID: {}", orderId);
+                    return new ResourceNotFoundException("Order Not Found with ID " + orderId);
+                });
     }
 
     @Override
     public List<BookOrder> findOrdersByEmail(Authentication authentication) {
         UserDTO user = authService.getUserInformation(authentication);
         String email = user.getEmail();
+        log.info("Fetching orders for user [{}]", email);
         return bookOrderRepository.findByEmail(email);
     }
 }

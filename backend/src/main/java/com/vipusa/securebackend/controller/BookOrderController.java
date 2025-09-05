@@ -4,9 +4,6 @@ import com.vipusa.securebackend.model.entity.BookOrder;
 import com.vipusa.securebackend.model.request.CreateOrderRequest;
 import com.vipusa.securebackend.response.ApiResponse;
 import com.vipusa.securebackend.service.service.BookOrderService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Slf4j
 @RequestMapping("/api/v1/order")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class BookOrderController {

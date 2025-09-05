@@ -1,0 +1,67 @@
+<configuration scan="true">
+
+    <!-- App-wide log pattern -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"/>
+
+    <!-- Console appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- General application log -->
+    <appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Authentication logs -->
+    <appender name="AUTH_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/auth.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/auth-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Order logs -->
+    <appender name="ORDERS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/orders.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/orders-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger (everything goes to app.log + console) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APP_FILE"/>
+    </root>
+
+    <!-- Authentication service logs → auth.log -->
+    <logger name="com.vipusa.securebackend.service.serviceImpl.AuthServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="AUTH_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Order service logs → orders.log -->
+    <logger name="com.vipusa.securebackend.service.serviceImpl.BookOrderServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="ORDERS_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+</configuration>
