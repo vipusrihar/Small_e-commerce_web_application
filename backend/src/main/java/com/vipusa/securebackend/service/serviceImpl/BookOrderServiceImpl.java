@@ -14,10 +14,14 @@ import com.vipusa.securebackend.repository.BookRepository;
 import com.vipusa.securebackend.service.service.AuthService;
 import com.vipusa.securebackend.service.service.BookOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -41,31 +45,29 @@ public class BookOrderServiceImpl implements BookOrderService {
         this.authService = authService;
     }
 
-
     @Override
     @Transactional
     public BookOrder createOrder(CreateOrderRequest request, Authentication authentication) {
 
         UserDTO userDTO = authService.getUserInformation(authentication);
 
-        if( !userDTO.getEmail().equals(request.getEmail())){
-            throw new RuntimeException("There is an error");
+        if (!userDTO.getEmail().equals(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot place orders on behalf of another user");
+        }
+
+        if (request.getOrderItems() == null || request.getOrderItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one product");
         }
 
         BookOrder bookOrder = new BookOrder();
         bookOrder.setEmail(userDTO.getEmail());
 
-        if(request.getOrderItems() == null || request.getOrderItems().isEmpty()){
-            throw new IllegalArgumentException("Order must contain at least one product");
-        }
-
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0.0;
 
         for (OrderItemRequest item : request.getOrderItems()) {
-            Integer id = item.getBookId();
-            Book book = bookRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Book Not Found With ID " + id));
+            Book book = bookRepository.findById(item.getBookId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Book Not Found With ID " + item.getBookId()));
 
             if (book.getStock() < item.getQuantity()) {
                 throw new IllegalArgumentException("Not enough stock for book: " + book.getTitle());
@@ -77,29 +79,40 @@ public class BookOrderServiceImpl implements BookOrderService {
             orderItem.setQuantity(item.getQuantity());
             orderItem.setAmount(book.getPrice() * item.getQuantity());
 
-            // Reduce Stock
+            // Reduce Stock safely
             book.setStock(book.getStock() - item.getQuantity());
-//            bookRepository.saveAndFlush(book); // flush immediately
             bookRepository.save(book);
 
             totalAmount += orderItem.getAmount();
             orderItems.add(orderItem);
         }
+
         bookOrder.setOrderItems(Collections.unmodifiableList(orderItems));
 
-        bookOrder.setOrderItems(orderItems);
         bookOrder.setTotalAmount(totalAmount);
 
-        bookOrder.setOrderDate(LocalDateTime.now(ZoneId.of("Asia/Colombo"))); //Sri Lanka timezone
+        checkDate(request.getPreferredDate());
+
+        bookOrder.setOrderDate(LocalDateTime.now(ZoneId.of("Asia/Colombo")));
         bookOrder.setPreferredDate(request.getPreferredDate());
         bookOrder.setPreferredTime(request.getPreferredTime());
-        bookOrder.setPreferredLocation(changeToLocation(request.getPreferredLocation().toUpperCase()));
+        bookOrder.setPreferredLocation(changeToLocation(request.getPreferredLocation()));
         bookOrder.setMessage(request.getMessage());
         bookOrder.setStatus(STATUS.STATUS_ORDERED);
 
         return bookOrderRepository.save(bookOrder);
-
     }
+
+    private void checkDate(LocalDate preferred) {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Colombo"));
+        if (preferred.isBefore(today)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Preferred date cannot be in the past");
+        }
+        if (preferred.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Delivery cannot be scheduled on Sunday");
+        }
+    }
+
 
     private LOCATION changeToLocation(String location){
         try {
