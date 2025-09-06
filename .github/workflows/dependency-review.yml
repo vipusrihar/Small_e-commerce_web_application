@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'package.json'
-      - 'pom.xml'
+      - 'frontend/package.json'
+      - 'backend/pom.xml'
 
 permissions:
   contents: read
