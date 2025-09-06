@@ -8,7 +8,6 @@ import {
 export const createOrder = (orderData) => async (dispatch) => {
   dispatch(createOrderStart());
   try {
-    console.log("Order data:", JSON.stringify(orderData));
 
     const { data } = await securedApi.post("/v1/order/", orderData, { withCredentials: true });
 
@@ -28,8 +27,6 @@ export const getOrdersByEmail = () => async (dispatch) => {
   dispatch(getAllOrdersStart());
   try {
     const { data } = await securedApi.get("/v1/order/user", { withCredentials: true });
-
-    console.log("Orders:", data?.response || data);
     dispatch(getAllOrdersSuccess(data?.response || data));
   } catch (error) {
     const message =

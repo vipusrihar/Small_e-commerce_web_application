@@ -26,7 +26,6 @@ const ProfilePage = () => {
   const user = useSelector((state) => state.auth.auth);
   const isLoading = useSelector((state) => state.auth.isLoading);
 
-  console.log('User:', user);
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen">

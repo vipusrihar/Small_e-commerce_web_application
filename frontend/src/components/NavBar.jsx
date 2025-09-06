@@ -1,9 +1,12 @@
-import React, { useState } from "react";
-import {  AppBar,  Box,  Toolbar,  IconButton,  Typography,
-  Menu,  Container,  Avatar,  Tooltip,  MenuItem,} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  AppBar, Box, Toolbar, IconButton, Typography,
+  Menu, Container, Avatar, Tooltip, MenuItem,
+} from "@mui/material";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { loginUser } from '../state/auth/authAction'
+import { useDispatch, useSelector } from "react-redux";
 import LoginPage from "../pages/LoginPage";
 
 const settings = ["Profile", "Orders", "Logout"];
@@ -12,15 +15,22 @@ const NavBar = () => {
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(loginUser())
+  }, [dispatch])
 
   const [loginModal, setLoginModal] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleLogin = () => setLoginModal(true);
 
-const handleLogout = () => {
-  window.location.href = "http://localhost:8080/logout";
-};
+
+
+  const handleLogout = () => {
+    window.location.href = "http://localhost:8080/logout";
+  };
 
   const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
