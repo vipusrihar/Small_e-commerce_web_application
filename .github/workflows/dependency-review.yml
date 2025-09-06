@@ -3,9 +3,6 @@ name: 'Dependency Review'
 on:
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'frontend/package.json'
-      - 'backend/pom.xml'
 
 permissions:
   contents: read
