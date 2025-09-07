@@ -107,6 +107,8 @@ public class BookOrderServiceImpl implements BookOrderService {
         bookOrder.setPreferredDate(request.getPreferredDate());
         bookOrder.setPreferredTime(request.getPreferredTime());
         bookOrder.setPreferredLocation(changeToLocation(request.getPreferredLocation()));
+        bookOrder.setFirstName(userDTO.getGiven_name());
+        bookOrder.setLastName(userDTO.getFamily_name());
         bookOrder.setMessage(request.getMessage());
         bookOrder.setStatus(STATUS.STATUS_ORDERED);
 
