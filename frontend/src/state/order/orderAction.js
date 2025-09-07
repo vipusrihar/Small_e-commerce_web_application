@@ -17,7 +17,6 @@ export const createOrder = (orderData) => async (dispatch) => {
   } catch (error) {
     const message =
       error.response?.data?.message || error.message || "Failed to create order";
-    console.error("Create order error:", message);
     dispatch(createOrderFailure(message));
   }
 };
@@ -31,7 +30,6 @@ export const getOrdersByEmail = (filter = "ALL") => async (dispatch) => {
   } catch (error) {
     const message =
       error.response?.data?.message || error.message || "Failed to fetch orders";
-    console.error("Get orders error:", message);
     dispatch(getAllOrdersFailure(message));
   }
 };

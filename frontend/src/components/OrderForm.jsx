@@ -142,7 +142,6 @@ const OrderForm = ({ open, onClose }) => {
       setQuantity(1);
       onClose();
     } catch (err) {
-      console.error(err);
       alert("Failed to submit order.");
     }
   };

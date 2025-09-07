@@ -23,7 +23,6 @@ export const loginUser = (navigate) => async (dispatch) => {
 
     if (navigate) navigate("/");
   } catch (error) {
-    console.error("Login error:", error.message);
     dispatch(loginFailure());
   }
 };

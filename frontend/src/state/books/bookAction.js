@@ -10,7 +10,6 @@ const handleBookError = (error, dispatch, failureAction) => {
   const message =
     error.response?.data?.message || error.message || 'Book operation failed. Please try again.';
   dispatch(failureAction(message));
-  console.error(message);
   return message;
 };
 
