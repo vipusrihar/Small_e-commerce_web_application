@@ -1,11 +1,10 @@
 name: 'Dependency Review'
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'frontend/package.json'
-      - 'backend/pom.xml'
 
 permissions:
   contents: read
@@ -22,3 +21,4 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: always
+
