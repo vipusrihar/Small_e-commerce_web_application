@@ -16,6 +16,7 @@ import java.util.Map;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    @SuppressWarnings("unused")
     private final OAuth2AuthorizedClientService authorizedClientService;
 
     public AuthServiceImpl(OAuth2AuthorizedClientService authorizedClientService) {

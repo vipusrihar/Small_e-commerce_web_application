@@ -3,7 +3,6 @@ package com.vipusa.securebackend.controller;
 import com.vipusa.securebackend.model.UserDTO;
 import com.vipusa.securebackend.response.ApiResponse;
 import com.vipusa.securebackend.service.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
