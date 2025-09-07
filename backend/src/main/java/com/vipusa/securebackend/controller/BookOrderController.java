@@ -53,9 +53,13 @@ public class BookOrderController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<ApiResponse<List<BookOrder>>>getOrders(Authentication authentication) {
+    public ResponseEntity<ApiResponse<List<BookOrder>>> getOrders(
+            @RequestParam(defaultValue = "ALL") String filter,
+            Authentication authentication) {
 
-        List<BookOrder> orders = orderService.findOrdersByEmail(authentication);
+        List<BookOrder> orders = orderService.findOrdersByEmailAndFilter(authentication, filter);
+
+        System.out.println(orders);
 
         ApiResponse<List<BookOrder>> response = ApiResponse.<List<BookOrder>>builder()
                 .response(orders)
@@ -65,5 +69,6 @@ public class BookOrderController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
 }

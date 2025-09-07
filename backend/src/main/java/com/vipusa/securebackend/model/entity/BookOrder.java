@@ -44,6 +44,7 @@ public class BookOrder {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
+    @Enumerated(EnumType.STRING)
     private STATUS status = STATUS.STATUS_ORDERED;
 
 }

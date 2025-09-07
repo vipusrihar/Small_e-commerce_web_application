@@ -149,11 +149,23 @@ public class BookOrderServiceImpl implements BookOrderService {
                 });
     }
 
-    @Override
-    public List<BookOrder> findOrdersByEmail(Authentication authentication) {
+    public List<BookOrder> findOrdersByEmailAndFilter(Authentication authentication, String filter) {
         UserDTO user = authService.getUserInformation(authentication);
         String email = user.getEmail();
-        log.info("Fetching orders for user [{}]", email);
-        return bookOrderRepository.findByEmail(email);
+        switch (filter.toUpperCase()) {
+
+            case "DELIVERED":
+                return bookOrderRepository.findByEmailAndStatus(email, STATUS.STATUS_DELIVERED);
+
+            case "PROCESSING":
+                return bookOrderRepository.findByEmailAndStatusIn(email,
+                        STATUS.processingStatuses());
+
+            case "ALL":
+            default:
+                return bookOrderRepository.findByEmail(email);
+        }
     }
+
+
 }

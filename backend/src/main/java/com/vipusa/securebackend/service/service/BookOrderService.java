@@ -13,5 +13,5 @@ public interface BookOrderService {
 
     BookOrder findOrderById(Integer orderId);
 
-    List<BookOrder> findOrdersByEmail(Authentication authentication);
+    List<BookOrder> findOrdersByEmailAndFilter(Authentication authentication, String filter);
 }
