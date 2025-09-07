@@ -1,18 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getOrdersByEmail } from "../state/order/orderAction";
 import {
   Card, CardContent, Table, TableHead, TableRow, TableCell,
-  TableBody, Typography, Chip,
+  TableBody, Typography, Chip, Tabs, Tab
 } from "@mui/material";
 
 const OrdersTable = () => {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
 
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
   useEffect(() => {
-    dispatch(getOrdersByEmail());
-  }, [dispatch]);
+    dispatch(getOrdersByEmail(statusFilter));
+  }, [dispatch, statusFilter]);
+
 
   const headings = [
     "ID", "Preferred Location", "Preferred Date", "Preferred Time", "Status", "Amount", "Message"
@@ -28,10 +31,23 @@ const OrdersTable = () => {
     STATUS_REJECTED: "error"
   };
 
+  const filterOptions = ["ALL", "PROCESSING", "DELIVERED"];
+
   return (
     <div className="p-6 pt-0">
       <Card className="shadow-lg border-2 rounded-2xl">
         <CardContent>
+          <Tabs
+            value={statusFilter}
+            onChange={(e, newValue) => setStatusFilter(newValue)}
+            variant="fullWidth"
+            sx={{ mb: 2 }}
+          >
+            {filterOptions.map((opt) => (
+              <Tab key={opt} value={opt} label={opt} />
+            ))}
+          </Tabs>
+
           <Table>
             <TableHead>
               <TableRow>
