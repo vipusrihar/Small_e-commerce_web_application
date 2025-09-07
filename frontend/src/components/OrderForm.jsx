@@ -114,8 +114,7 @@ const OrderForm = ({ open, onClose }) => {
       return;
     }
 
-    const formattedDate = formData.date.toISOString().split("T")[0];
-
+    const formattedDate = formData.date.toLocaleDateString("en-CA");
     const orderData = {
       email: DOMPurify.sanitize(user.email),
       preferredDate: formattedDate,
@@ -129,7 +128,7 @@ const OrderForm = ({ open, onClose }) => {
     };
 
     try {
-      await dispatch(createOrder(orderData)); 
+      await dispatch(createOrder(orderData));
 
       setFormData({
         date: null,

@@ -1,5 +1,6 @@
 package com.vipusa.securebackend.model.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ public class CreateOrderRequest {
 
     private List<OrderItemRequest> orderItems;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate preferredDate;
 
     private String preferredTime;

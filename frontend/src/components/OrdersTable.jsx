@@ -62,6 +62,7 @@ const OrdersTable = () => {
             <TableBody>
               {orders && orders.length > 0 ? (
                 orders.map((order) => (
+
                   <TableRow key={order.id} hover>
                     <TableCell>#{order.id}</TableCell>
                     <TableCell>{order.preferredLocation}</TableCell>
@@ -77,9 +78,10 @@ const OrdersTable = () => {
                     </TableCell>
                     <TableCell>
                       <Typography fontWeight="bold">
-                        Rs. {order.totalAmount}
+                        Rs. {order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
                       </Typography>
                     </TableCell>
+
                     <TableCell>{order.message || "-"}</TableCell>
                   </TableRow>
                 ))
