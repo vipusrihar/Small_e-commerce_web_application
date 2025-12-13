@@ -37,7 +37,7 @@ const UserCard = ({ user, open, onClose }) => {
           <Typography><strong>Email:</strong> {user.email}</Typography>
           <Typography><strong>Phone:</strong> {user.phone_number}</Typography>
           <Typography><strong>Username:</strong> {user.preferred_username}</Typography>
-          <Typography><strong>Role:</strong> {user.roles}</Typography>
+          {/* <Typography><strong>Role:</strong> {user.roles}</Typography> */}
           <Typography>
             <strong>Address:</strong> {user.street_address}, {user.postal_code}, {user.country}
           </Typography>

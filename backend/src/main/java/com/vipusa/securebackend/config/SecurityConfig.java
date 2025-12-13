@@ -32,7 +32,7 @@ public class SecurityConfig {
                 // Endpoint security
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/book/**").permitAll()   // public
-                        .requestMatchers("/api/orders/**").authenticated() // protected
+                        .requestMatchers("/api/v1/order/**").authenticated() // protected
                         .anyRequest().authenticated()
                 )
 
